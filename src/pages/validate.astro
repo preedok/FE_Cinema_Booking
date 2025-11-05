@@ -1,0 +1,25 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+---
+
+<MainLayout title="Validate Booking">
+    <div class="min-h-[80vh] flex items-center justify-center py-12">
+        <div id="validate-container"></div>
+    </div>
+</MainLayout>
+
+<script>
+    import React from "react";
+    import { createRoot } from "react-dom/client";
+    import { ValidateBooking } from "../components/booking/ValidateBooking";
+
+    const ValidatePage = () => {
+        return React.createElement(ValidateBooking);
+    };
+
+    const container = document.getElementById("validate-container");
+    if (container) {
+        const root = createRoot(container);
+        root.render(React.createElement(ValidatePage));
+    }
+</script>

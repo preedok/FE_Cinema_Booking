@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Film, User, LogOut, Ticket, Menu, X, Sparkles } from 'lucide-react';
+import { Film, User, LogOut, Ticket, Menu, X, Sparkles, QrCode, ChevronDown, CreditCard, Smartphone } from 'lucide-react';
 import { Button } from './ui/Button';
 import { useAuthStore } from '../lib/stores/auth';
 
 export const Navbar: React.FC = () => {
     const [mounted, setMounted] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [bookingDropdownOpen, setBookingDropdownOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const { user, isAuthenticated, logout, initAuth } = useAuthStore();
 
@@ -50,7 +51,7 @@ export const Navbar: React.FC = () => {
             }`}>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex h-20 items-center justify-between">
-                    
+
                     <a href="/" className="flex items-center gap-3 group">
                         <div className="relative">
                             <div className="absolute inset-0 gradient-primary opacity-20 blur-xl rounded-full group-hover:opacity-40 transition-opacity"></div>
@@ -64,17 +65,54 @@ export const Navbar: React.FC = () => {
                         <Sparkles className="w-4 h-4 text-violet-500 animate-pulse" />
                     </a>
 
-                    
+
                     <div className="hidden md:flex items-center gap-2">
+                        {/* Booking Dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setBookingDropdownOpen(!bookingDropdownOpen)}
+                                className="px-5 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium flex items-center gap-2 hover-lift"
+                            >
+                                <Ticket className="w-4 h-4" />
+                                Book Tickets
+                                <ChevronDown className={`w-4 h-4 transition-transform ${bookingDropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {bookingDropdownOpen && (
+                                <div className="absolute top-full mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 py-2 z-50 animate-fade-in">
+                                    <a
+                                        href="/booking"
+                                        className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                                        onClick={() => setBookingDropdownOpen(false)}
+                                    >
+                                        <Smartphone className="w-4 h-4 text-primary" />
+                                        <div>
+                                            <div className="font-medium">Online Booking</div>
+                                            <div className="text-xs text-muted-foreground">Book tickets online</div>
+                                        </div>
+                                    </a>
+                                    <a
+                                        href="/booking-offline"
+                                        className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                                        onClick={() => setBookingDropdownOpen(false)}
+                                    >
+                                        <CreditCard className="w-4 h-4 text-primary" />
+                                        <div>
+                                            <div className="font-medium">Offline Booking</div>
+                                            <div className="text-xs text-muted-foreground">Walk-in purchase</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+
                         <a
-                            href="/booking"
-                            className="px-5 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium hover-lift"
+                            href="/validate"
+                            className="px-5 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium flex items-center gap-2 hover-lift"
                         >
-                            Book Tickets
+                            <QrCode className="w-4 h-4" />
+                            Validate
                         </a>
-                        {user?.role === 'customer' && (
-                            <a href="/booking-offline" className="px-5 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium hover-lift">Offline Booking</a>
-                        )}
                         {isAuthenticated ? (
                             <>
                                 <a
@@ -126,7 +164,7 @@ export const Navbar: React.FC = () => {
                         )}
                     </div>
 
-                    
+
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="md:hidden p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
@@ -139,14 +177,34 @@ export const Navbar: React.FC = () => {
                     </button>
                 </div>
 
-                
+
                 {mobileMenuOpen && (
                     <div className="md:hidden py-6 space-y-3 border-t border-slate-200 dark:border-slate-700 animate-fade-in">
+                        {/* Mobile Booking Section */}
+                        <div className="px-5 space-y-2">
+                            <div className="text-sm font-semibold text-muted-foreground mb-2">Book Tickets</div>
+                            <a
+                                href="/booking"
+                                className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium"
+                            >
+                                <Smartphone className="w-4 h-4" />
+                                Online Booking
+                            </a>
+                            <a
+                                href="/booking-offline"
+                                className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium"
+                            >
+                                <CreditCard className="w-4 h-4" />
+                                Offline Booking
+                            </a>
+                        </div>
+
                         <a
-                            href="/booking"
-                            className="block px-5 py-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium"
+                            href="/validate"
+                            className=" px-5 py-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium flex items-center gap-2"
                         >
-                            Book Tickets
+                            <QrCode className="w-4 h-4" />
+                            Validate
                         </a>
 
                         {isAuthenticated ? (
