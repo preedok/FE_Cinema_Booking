@@ -80,7 +80,7 @@ cinema-booking/
 
    ```bash
    git clone <repository-url>
-   cd cinema-booking
+   cd FE_Cinema_Booking
    ```
 
 2. **Install dependencies**
