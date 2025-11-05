@@ -72,7 +72,9 @@ export const Navbar: React.FC = () => {
                         >
                             Book Tickets
                         </a>
-
+                        {user?.role === 'customer' && (
+                            <a href="/booking-offline" className="px-5 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium hover-lift">Offline Booking</a>
+                        )}
                         {isAuthenticated ? (
                             <>
                                 <a

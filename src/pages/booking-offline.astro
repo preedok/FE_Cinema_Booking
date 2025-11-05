@@ -1,0 +1,69 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+---
+
+<MainLayout title="Offline Booking">
+    <div id="offline-booking-container" class="animate-fade-in"></div>
+</MainLayout>
+
+<script>
+    import React, { useState } from "react";
+    import { createRoot } from "react-dom/client";
+    import { StudioSelector } from "../components/booking/StudioSelector";
+    import { SeatSelector } from "../components/booking/SeatSelector";
+    import { OfflineBookingSummary } from "../components/booking/OfflineBookingSummary";
+    import { QRCodeModal } from "../components/booking/QRCodeModal";
+    import type { BookingResponse } from "../types";
+
+    const OfflineBookingPage = () => {
+        const [bookingResult, setBookingResult] =
+            useState<BookingResponse | null>(null);
+
+        return React.createElement(
+            "div",
+            { className: "space-y-8" },
+            React.createElement(
+                "div",
+                null,
+                React.createElement(
+                    "h1",
+                    { className: "text-4xl font-bold mb-2" },
+                    "Offline Booking",
+                ),
+                React.createElement(
+                    "p",
+                    { className: "text-muted-foreground text-lg" },
+                    "Process walk-in bookings for customers",
+                ),
+            ),
+            React.createElement(
+                "div",
+                { className: "grid lg:grid-cols-3 gap-8" },
+                React.createElement(
+                    "div",
+                    { className: "lg:col-span-2 space-y-8" },
+                    React.createElement(StudioSelector),
+                    React.createElement(SeatSelector),
+                ),
+                React.createElement(
+                    "div",
+                    { className: "lg:col-span-1" },
+                    React.createElement(OfflineBookingSummary, {
+                        onSuccess: setBookingResult,
+                    }),
+                ),
+            ),
+            bookingResult &&
+                React.createElement(QRCodeModal, {
+                    booking: bookingResult,
+                    onClose: () => setBookingResult(null),
+                }),
+        );
+    };
+
+    const container = document.getElementById("offline-booking-container");
+    if (container) {
+        const root = createRoot(container);
+        root.render(React.createElement(OfflineBookingPage));
+    }
+</script>
