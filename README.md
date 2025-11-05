@@ -31,6 +31,7 @@ cinema-booking/
 │   │   ├── auth/
 │   │   │   ├── LoginForm.tsx
 │   │   │   └── RegisterForm.tsx
+|   |   |   └── OfflineBookingSummary.tsx
 │   │   ├── booking/
 │   │   │   ├── StudioSelector.tsx
 │   │   │   ├── SeatSelector.tsx
@@ -49,6 +50,7 @@ cinema-booking/
 │   │   ├── auth.astro
 │   │   ├── booking.astro
 │   │   └── my-bookings.astro
+│   │   └── booking-offline.astro
 │   ├── lib/
 │   │   ├── api.ts
 │   │   ├── utils.ts
