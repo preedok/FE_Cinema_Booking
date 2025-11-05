@@ -1,12 +1,14 @@
 
 export interface User {
-    id: number;
+    id: number | string;
     email: string;
     name: string;
+    avatar?: string;
     role: 'customer' | 'cashier' | 'admin';
     created_at: string;
     updated_at: string;
 }
+
 
 export interface AuthResponse {
     user: User;

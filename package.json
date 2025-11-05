@@ -11,6 +11,8 @@
   "dependencies": {
     "@astrojs/react": "^4.4.1",
     "@astrojs/tailwind": "^6.0.2",
+    "@auth0/auth0-react": "^2.8.0",
+    "@supabase/supabase-js": "^2.79.0",
     "astro": "^5.15.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
