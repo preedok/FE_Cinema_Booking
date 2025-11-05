@@ -57,7 +57,7 @@ class ApiClient {
         return this.handleResponse<AuthResponse>(response);
     }
 
-    // CINEMA
+   
     async getStudios(): Promise<Studio[]> {
         const response = await fetch(`${API_BASE_URL}/cinema/studios`, {
             headers: this.getHeaders(),
