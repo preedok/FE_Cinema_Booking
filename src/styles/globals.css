@@ -1,0 +1,235 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 84% 4.9%;
+        --primary: 262.1 83.3% 57.8%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 210 40% 96.1%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --accent: 210 40% 96.1%;
+        --accent-foreground: 222.2 47.4% 11.2%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 214.3 31.8% 91.4%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 262.1 83.3% 57.8%;
+        --radius: 1rem;
+    }
+
+    .dark {
+        --background: 222.2 84% 4.9%;
+        --foreground: 210 40% 98%;
+        --card: 222.2 84% 4.9%;
+        --card-foreground: 210 40% 98%;
+        --popover: 222.2 84% 4.9%;
+        --popover-foreground: 210 40% 98%;
+        --primary: 263.4 70% 50.4%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 217.2 32.6% 17.5%;
+        --secondary-foreground: 210 40% 98%;
+        --muted: 217.2 32.6% 17.5%;
+        --muted-foreground: 215 20.2% 65.1%;
+        --accent: 217.2 32.6% 17.5%;
+        --accent-foreground: 210 40% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 217.2 32.6% 17.5%;
+        --input: 217.2 32.6% 17.5%;
+        --ring: 263.4 70% 50.4%;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground antialiased;
+        font-feature-settings: "cv11", "ss01";
+    }
+}
+
+@layer utilities {
+
+    /* Glass Effects */
+    .glass {
+        @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-slate-700/50;
+    }
+
+    .glass-card {
+        @apply bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-slate-200/50 dark:border-slate-700/50 shadow-2xl shadow-slate-900/5;
+    }
+
+    /* Modern Gradients */
+    .gradient-primary {
+        @apply bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-600;
+    }
+
+    .gradient-accent {
+        @apply bg-gradient-to-br from-pink-500 via-rose-500 to-orange-500;
+    }
+
+    .gradient-success {
+        @apply bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500;
+    }
+
+    .gradient-mesh {
+        background:
+            radial-gradient(at 0% 0%, rgb(124, 58, 237) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgb(79, 70, 229) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgb(219, 39, 119) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgb(168, 85, 247) 0px, transparent 50%);
+    }
+
+    /* Animations */
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slide-in {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes scale-in {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes shimmer {
+        0% {
+            background-position: -1000px 0;
+        }
+
+        100% {
+            background-position: 1000px 0;
+        }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.5s ease-out forwards;
+    }
+
+    .animate-slide-in {
+        animation: slide-in 0.5s ease-out forwards;
+    }
+
+    .animate-scale-in {
+        animation: scale-in 0.3s ease-out forwards;
+    }
+
+    .animate-shimmer {
+        animation: shimmer 2s linear infinite;
+        background: linear-gradient(to right,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 100%);
+        background-size: 1000px 100%;
+    }
+
+    /* Modern Shadows */
+    .shadow-glow {
+        box-shadow:
+            0 0 20px -5px rgb(124 58 237 / 0.3),
+            0 0 40px -10px rgb(79 70 229 / 0.2);
+    }
+
+    .shadow-glow-lg {
+        box-shadow:
+            0 0 30px -5px rgb(124 58 237 / 0.4),
+            0 0 60px -10px rgb(79 70 229 / 0.3),
+            0 20px 40px -15px rgb(0 0 0 / 0.15);
+    }
+
+    /* Smooth Transitions */
+    .transition-smooth {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .transition-bounce {
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    /* Hover Effects */
+    .hover-lift {
+        @apply transition-smooth hover:-translate-y-1 hover:shadow-glow;
+    }
+
+    .hover-scale {
+        @apply transition-smooth hover:scale-105;
+    }
+
+    /* Modern Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        @apply bg-slate-100 dark:bg-slate-800 rounded-full;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-slate-300 dark:bg-slate-600 rounded-full hover:bg-slate-400 dark:hover:bg-slate-500;
+    }
+}
+
+/* Loading Skeleton */
+@keyframes skeleton-loading {
+    0% {
+        background-position: -200px 0;
+    }
+
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.skeleton {
+    animation: skeleton-loading 1.2s ease-in-out infinite;
+    background: linear-gradient(90deg,
+            rgba(226, 232, 240, 0.5) 0px,
+            rgba(226, 232, 240, 1) 40px,
+            rgba(226, 232, 240, 0.5) 80px);
+    background-size: 200px 100%;
+}
+
+.dark .skeleton {
+    background: linear-gradient(90deg,
+            rgba(51, 65, 85, 0.5) 0px,
+            rgba(51, 65, 85, 1) 40px,
+            rgba(51, 65, 85, 0.5) 80px);
+}

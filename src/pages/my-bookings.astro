@@ -1,0 +1,266 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+---
+
+<MainLayout title="My Bookings">
+  <div id="my-bookings-container" class="animate-fade-in"></div>
+</MainLayout>
+
+<script>
+  import React, { useEffect, useState } from "react";
+  import { createRoot } from "react-dom/client";
+  import { Ticket, Loader2, AlertCircle } from "lucide-react";
+  import { BookingCard } from "../components/booking/BookingCard";
+  import { Card, CardContent } from "../components/ui/Card";
+  import { Button } from "../components/ui/Button";
+  import { apiClient } from "../lib/api";
+  import { useAuthStore } from "../lib/stores/auth";
+  import type { Booking } from "../types";
+
+  const MyBookingsPage = () => {
+    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const { isAuthenticated, initAuth } = useAuthStore();
+
+    useEffect(() => {
+      initAuth();
+      if (isAuthenticated) {
+        loadBookings();
+      } else {
+        setLoading(false);
+      }
+    }, [isAuthenticated]);
+
+    const loadBookings = async () => {
+      try {
+        const data = await apiClient.getMyBookings();
+        setBookings(data);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to load bookings",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!isAuthenticated && !loading) {
+      return React.createElement(
+        "div",
+        { className: "min-h-[60vh] flex items-center justify-center" },
+        React.createElement(
+          Card,
+          { className: "max-w-md border-2" },
+          React.createElement(
+            CardContent,
+            { className: "p-12 text-center space-y-4" },
+            React.createElement(
+              "div",
+              {
+                className:
+                  "w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto",
+              },
+              React.createElement(AlertCircle, {
+                className: "w-8 h-8 text-amber-600",
+              }),
+            ),
+            React.createElement(
+              "h2",
+              { className: "text-2xl font-bold" },
+              "Authentication Required",
+            ),
+            React.createElement(
+              "p",
+              { className: "text-muted-foreground" },
+              "Please sign in to view your bookings",
+            ),
+            React.createElement(
+              Button,
+              {
+                onClick: () => (window.location.href = "/auth"),
+                className: "w-full",
+              },
+              "Sign In",
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (loading) {
+      return React.createElement(
+        "div",
+        { className: "space-y-6" },
+        React.createElement(
+          "div",
+          { className: "flex items-center gap-3" },
+          React.createElement(
+            "div",
+            { className: "p-2 rounded-lg gradient-primary" },
+            React.createElement(Ticket, { className: "w-6 h-6 text-white" }),
+          ),
+          React.createElement(
+            "h1",
+            { className: "text-4xl font-bold" },
+            "My Bookings",
+          ),
+        ),
+        React.createElement(
+          "div",
+          { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-6" },
+          [...Array(3)].map((_, i) =>
+            React.createElement(
+              Card,
+              { key: i, className: "animate-pulse" },
+              React.createElement(
+                CardContent,
+                { className: "p-6" },
+                React.createElement(
+                  "div",
+                  { className: "space-y-3" },
+                  React.createElement("div", {
+                    className: "h-6 bg-muted rounded",
+                  }),
+                  React.createElement("div", {
+                    className: "h-4 bg-muted rounded w-2/3",
+                  }),
+                  React.createElement("div", {
+                    className: "h-20 bg-muted rounded",
+                  }),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (error) {
+      return React.createElement(
+        "div",
+        { className: "min-h-[60vh] flex items-center justify-center" },
+        React.createElement(
+          Card,
+          { className: "max-w-md border-2" },
+          React.createElement(
+            CardContent,
+            { className: "p-12 text-center space-y-4" },
+            React.createElement(
+              "div",
+              {
+                className:
+                  "w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto",
+              },
+              React.createElement(AlertCircle, {
+                className: "w-8 h-8 text-destructive",
+              }),
+            ),
+            React.createElement(
+              "h2",
+              { className: "text-2xl font-bold" },
+              "Error",
+            ),
+            React.createElement(
+              "p",
+              { className: "text-muted-foreground" },
+              error,
+            ),
+            React.createElement(Button, { onClick: loadBookings }, "Try Again"),
+          ),
+        ),
+      );
+    }
+
+    return React.createElement(
+      "div",
+      { className: "space-y-6" },
+      React.createElement(
+        "div",
+        { className: "flex items-center justify-between" },
+        React.createElement(
+          "div",
+          { className: "flex items-center gap-3" },
+          React.createElement(
+            "div",
+            { className: "p-2 rounded-lg gradient-primary" },
+            React.createElement(Ticket, { className: "w-6 h-6 text-white" }),
+          ),
+          React.createElement(
+            "div",
+            null,
+            React.createElement(
+              "h1",
+              { className: "text-4xl font-bold" },
+              "My Bookings",
+            ),
+            React.createElement(
+              "p",
+              { className: "text-muted-foreground" },
+              `${bookings.length} booking${bookings.length !== 1 ? "s" : ""} found`,
+            ),
+          ),
+        ),
+        React.createElement(
+          Button,
+          { onClick: () => (window.location.href = "/booking") },
+          "New Booking",
+        ),
+      ),
+      bookings.length === 0
+        ? React.createElement(
+            Card,
+            { className: "border-2 border-dashed" },
+            React.createElement(
+              CardContent,
+              { className: "p-12 text-center space-y-4" },
+              React.createElement(
+                "div",
+                {
+                  className:
+                    "w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto",
+                },
+                React.createElement(Ticket, {
+                  className: "w-8 h-8 text-muted-foreground",
+                }),
+              ),
+              React.createElement(
+                "div",
+                null,
+                React.createElement(
+                  "h3",
+                  { className: "text-xl font-semibold mb-2" },
+                  "No bookings yet",
+                ),
+                React.createElement(
+                  "p",
+                  { className: "text-muted-foreground" },
+                  "Start booking your tickets now!",
+                ),
+              ),
+              React.createElement(
+                Button,
+                { onClick: () => (window.location.href = "/booking") },
+                "Book Now",
+              ),
+            ),
+          )
+        : React.createElement(
+            "div",
+            { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-6" },
+            bookings.map((booking) =>
+              React.createElement(BookingCard, {
+                key: booking.id,
+                booking: booking,
+              }),
+            ),
+          ),
+    );
+  };
+
+  const container = document.getElementById("my-bookings-container");
+  if (container) {
+    const root = createRoot(container);
+    root.render(React.createElement(MyBookingsPage));
+  }
+</script>

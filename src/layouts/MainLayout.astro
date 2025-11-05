@@ -1,0 +1,33 @@
+---
+import '../styles/globals.css';
+import { Navbar } from '../components/Navbar';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Modern cinema booking system' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} | CinemaBook</title>
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 dark:from-slate-950 dark:via-purple-950 dark:to-indigo-950">
+    <Navbar client:load />
+    <main class="container mx-auto px-4 py-8">
+      <slot />
+    </main>
+    <footer class="border-t mt-16 py-8 bg-background/50 backdrop-blur-sm">
+      <div class="container mx-auto px-4 text-center text-sm text-muted-foreground">
+        <p>&copy; 2025 CinemaBook. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>
