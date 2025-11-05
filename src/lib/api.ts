@@ -11,7 +11,7 @@ import type {
     Booking,
 } from '../types';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 class ApiClient {
     private getHeaders(includeAuth = false): HeadersInit {
@@ -57,7 +57,7 @@ class ApiClient {
         return this.handleResponse<AuthResponse>(response);
     }
 
-    
+    // CINEMA
     async getStudios(): Promise<Studio[]> {
         const response = await fetch(`${API_BASE_URL}/cinema/studios`, {
             headers: this.getHeaders(),
