@@ -53,6 +53,7 @@ cinema-booking/
 │   │   └── booking-offline.astro
 │   ├── lib/
 │   │   ├── api.ts
+│   │   ├── supabase.ts
 │   │   ├── utils.ts
 │   │   └── stores/
 │   │       ├── auth.ts
