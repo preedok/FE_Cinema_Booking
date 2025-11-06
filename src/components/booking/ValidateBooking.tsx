@@ -5,7 +5,7 @@ import { Input } from '../ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { apiClient } from '../../lib/api';
 import type { ValidationResponse } from '../../types';
-import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library'; // Import ZXing
+import jsQR from 'jsqr'; // Import jsQR dari npm package
 
 interface ValidateBookingProps {
     onValidationSuccess?: (result: ValidationResponse) => void;
@@ -24,8 +24,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const scanTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null); // Ref untuk ZXing reader
+    const scanTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Tambahkan ref untuk timeout
 
     const startCamera = async () => {
         try {
@@ -34,44 +33,37 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
             setScanError(null);
             setError(null);
 
-            // Inisialisasi ZXing reader jika belum ada
-            if (!codeReaderRef.current) {
-                codeReaderRef.current = new BrowserMultiFormatReader();
-            }
-
-            const result = await codeReaderRef.current.decodeFromInputVideoDevice(undefined, videoRef.current!);
-            if (result) {
-                console.log('QR Code detected:', result.getText());
-                stopCamera();
-
-                // Parse JSON dan ambil bookingCode
-                try {
-                    const parsedData = JSON.parse(result.getText());
-                    const extractedBookingCode = parsedData.bookingCode;
-                    if (!extractedBookingCode) {
-                        setScanError('QR code tidak valid: tidak ada bookingCode.');
-                        return;
-                    }
-                    setBookingCode(extractedBookingCode);
-                    handleValidate(extractedBookingCode);
-                } catch (parseErr) {
-                    console.error('JSON parse error:', parseErr);
-                    setScanError('QR code tidak valid: format JSON salah.');
+            const constraints = {
+                video: {
+                    facingMode: { ideal: 'environment' },
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
                 }
+            };
+
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            streamRef.current = stream;
+
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+                await videoRef.current.play();
+
+                // Set timeout untuk stop scanning jika tidak ada deteksi dalam 30 detik
+                scanTimeoutRef.current = setTimeout(() => {
+                    if (scanning) {
+                        stopCamera();
+                        setScanError('Pemindaian timeout. Pastikan QR code terlihat jelas dan pencahayaan cukup.');
+                    }
+                }, 30000); // 30 detik
+
+                // Start scanning after video is ready
+                requestAnimationFrame(scan);
             }
         } catch (err) {
-            if (err instanceof NotFoundException) {
-                console.log('No QR code found, continuing scan...');
-                // Jika tidak ditemukan, lanjutkan scanning
-                if (scanning) {
-                    setTimeout(() => startCamera(), 100); // Retry setiap 100ms
-                }
-            } else {
-                console.error('Camera error:', err);
-                setScanError('Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.');
-                setShowScanner(false);
-                setScanning(false);
-            }
+            console.error('Camera error:', err);
+            setScanError('Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.');
+            setShowScanner(false);
+            setScanning(false);
         }
     };
 
@@ -79,9 +71,6 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
         if (scanTimeoutRef.current) {
             clearTimeout(scanTimeoutRef.current);
             scanTimeoutRef.current = null;
-        }
-        if (codeReaderRef.current) {
-            codeReaderRef.current.reset();
         }
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(track => track.stop());
@@ -95,6 +84,60 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
         setScanError(null);
     };
 
+    const scan = () => {
+        if (!scanning || !videoRef.current || !canvasRef.current) return;
+
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+
+        if (!context) return;
+
+        // Pastikan video sudah siap
+        if (video.readyState !== video.HAVE_ENOUGH_DATA || video.videoWidth === 0) {
+            if (scanning) {
+                requestAnimationFrame(scan);
+            }
+            return;
+        }
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+        // Tingkatkan opsi deteksi jsQR untuk lebih baik
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: 'attemptBoth', // Coba dengan dan tanpa inversi
+        });
+
+        if (code && code.data) {
+            console.log('QR Code detected:', code.data);
+            stopCamera();
+
+            // Parse JSON dan ambil bookingCode
+            try {
+                const parsedData = JSON.parse(code.data);
+                const extractedBookingCode = parsedData.bookingCode;
+                if (!extractedBookingCode) {
+                    setScanError('QR code tidak valid: tidak ada bookingCode.');
+                    return;
+                }
+                setBookingCode(extractedBookingCode);
+                handleValidate(extractedBookingCode); // Langsung validasi setelah deteksi
+            } catch (parseErr) {
+                console.error('JSON parse error:', parseErr);
+                setScanError('QR code tidak valid: format JSON salah.');
+            }
+            return;
+        }
+
+        if (scanning) {
+            requestAnimationFrame(scan);
+        }
+    };
+
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -104,35 +147,55 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
         setError(null);
 
         try {
-            // Inisialisasi ZXing reader jika belum ada
-            if (!codeReaderRef.current) {
-                codeReaderRef.current = new BrowserMultiFormatReader();
-            }
+            const image = new Image();
+            const reader = new FileReader();
 
-            const result = await codeReaderRef.current.decodeFromImageUrl(URL.createObjectURL(file));
-            if (result) {
-                console.log('QR Code detected from file:', result.getText());
+            reader.onload = (e) => {
+                image.src = e.target?.result as string;
+            };
 
-                // Parse JSON dan ambil bookingCode
-                try {
-                    const parsedData = JSON.parse(result.getText());
-                    const extractedBookingCode = parsedData.bookingCode;
-                    if (!extractedBookingCode) {
-                        setScanError('QR code tidak valid: tidak ada bookingCode.');
+            image.onload = () => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+
+                const context = canvas.getContext('2d', { willReadFrequently: true });
+                if (!context) return;
+
+                canvas.width = image.width;
+                canvas.height = image.height;
+                context.drawImage(image, 0, 0);
+
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+                // Tingkatkan opsi deteksi jsQR untuk lebih baik
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: 'attemptBoth', // Coba dengan dan tanpa inversi
+                });
+
+                if (code && code.data) {
+                    // Parse JSON dan ambil bookingCode
+                    try {
+                        const parsedData = JSON.parse(code.data);
+                        const extractedBookingCode = parsedData.bookingCode;
+                        if (!extractedBookingCode) {
+                            setScanError('QR code tidak valid: tidak ada bookingCode.');
+                            setLoading(false);
+                            return;
+                        }
+                        setBookingCode(extractedBookingCode);
+                        handleValidate(extractedBookingCode); // Langsung validasi setelah deteksi
+                    } catch (parseErr) {
+                        console.error('JSON parse error:', parseErr);
+                        setScanError('QR code tidak valid: format JSON salah.');
                         setLoading(false);
-                        return;
                     }
-                    setBookingCode(extractedBookingCode);
-                    handleValidate(extractedBookingCode);
-                } catch (parseErr) {
-                    console.error('JSON parse error:', parseErr);
-                    setScanError('QR code tidak valid: format JSON salah.');
+                } else {
+                    setScanError('Tidak dapat membaca QR code dari gambar. Pastikan gambar jelas dan QR code terlihat.');
                     setLoading(false);
                 }
-            } else {
-                setScanError('Tidak dapat membaca QR code dari gambar. Pastikan gambar jelas dan QR code terlihat.');
-                setLoading(false);
-            }
+            };
+
+            reader.readAsDataURL(file);
         } catch (err) {
             console.error('File upload error:', err);
             setScanError('Gagal memproses gambar');
@@ -157,13 +220,13 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
         setValidationResult(null);
 
         try {
-            console.log('Sending validation request for code:', codeToValidate);
+            console.log('Sending validation request for code:', codeToValidate); // Tambahkan logging
             const result = await apiClient.validateBooking(codeToValidate.trim());
-            console.log('Validation result:', result);
+            console.log('Validation result:', result); // Tambahkan logging
             setValidationResult(result);
             onValidationSuccess?.(result);
         } catch (err) {
-            console.error('Validation error:', err);
+            console.error('Validation error:', err); // Tambahkan logging
             setError(err instanceof Error ? err.message : 'Validasi gagal');
         } finally {
             setLoading(false);
