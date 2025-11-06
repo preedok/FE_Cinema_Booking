@@ -5,7 +5,185 @@ import { Input } from '../ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { apiClient } from '../../lib/api';
 import type { ValidationResponse } from '../../types';
-import jsQR from 'jsqr'; 
+
+// Simple QR Scanner Component using HTML5
+const QRScanner = ({ onScan, onError, onClose }: {
+    onScan: (data: string) => void;
+    onError: (error: string) => void;
+    onClose: () => void;
+}) => {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const streamRef = useRef<MediaStream | null>(null);
+    const animationRef = useRef<number | null>(null);
+
+    React.useEffect(() => {
+        let mounted = true;
+
+        const initCamera = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+
+                if (!mounted) {
+                    stream.getTracks().forEach(track => track.stop());
+                    return;
+                }
+
+                streamRef.current = stream;
+
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                    videoRef.current.play();
+
+                    // Wait for video to be ready
+                    videoRef.current.onloadedmetadata = () => {
+                        if (mounted) {
+                            setTimeout(() => {
+                                startScanning();
+                            }, 1000);
+                        }
+                    };
+                }
+            } catch (err) {
+                console.error('Camera error:', err);
+                if (mounted) {
+                    onError('Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.');
+                }
+            }
+        };
+
+        const startScanning = () => {
+            const scanFrame = () => {
+                if (!mounted || !videoRef.current || !canvasRef.current) {
+                    return;
+                }
+
+                const video = videoRef.current;
+                const canvas = canvasRef.current;
+
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                    if (!ctx) return;
+
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+                    // Use jsQR if available
+                    if (typeof (window as any).jsQR !== 'undefined') {
+                        const code = (window as any).jsQR(imageData.data, imageData.width, imageData.height, {
+                            inversionAttempts: 'attemptBoth',
+                        });
+
+                        if (code && code.data && mounted) {
+                            console.log('✅ QR Code detected:', code.data);
+                            onScan(code.data);
+                            return; // Stop scanning after successful scan
+                        }
+                    }
+                }
+
+                if (mounted) {
+                    animationRef.current = requestAnimationFrame(scanFrame);
+                }
+            };
+
+            scanFrame();
+        };
+
+        // Load jsQR library
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js';
+        script.async = true;
+        script.onload = () => {
+            console.log('jsQR library loaded');
+            initCamera();
+        };
+        script.onerror = () => {
+            console.error('Failed to load jsQR library');
+            if (mounted) {
+                onError('Gagal memuat library scanner');
+            }
+        };
+        document.head.appendChild(script);
+
+        return () => {
+            mounted = false;
+            if (animationRef.current) {
+                cancelAnimationFrame(animationRef.current);
+            }
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop());
+            }
+            document.head.removeChild(script);
+        };
+    }, [onScan, onError]);
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-fade-in">
+            <Card className="w-full max-w-lg border-2 shadow-2xl relative">
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 p-2 rounded-full bg-red-500 hover:bg-red-600 transition-colors z-10"
+                >
+                    <X className="w-5 h-5 text-white" />
+                </button>
+
+                <div className="p-6 space-y-4">
+                    <div className="text-center">
+                        <h3 className="text-2xl font-bold mb-2">Pindai Kode QR</h3>
+                        <p className="text-sm text-muted-foreground">
+                            Arahkan kamera ke kode QR booking
+                        </p>
+                    </div>
+
+                    <div className="relative bg-black rounded-xl overflow-hidden aspect-video">
+                        <video
+                            ref={videoRef}
+                            className="w-full h-full object-cover"
+                            playsInline
+                            muted
+                            autoPlay
+                        />
+                        <canvas ref={canvasRef} className="hidden" />
+
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="relative w-64 h-64">
+                                <div className="absolute inset-0 border-2 border-white/30 rounded-2xl"></div>
+                                <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-green-500 rounded-tl-2xl animate-pulse"></div>
+                                <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-green-500 rounded-tr-2xl animate-pulse"></div>
+                                <div className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-green-500 rounded-bl-2xl animate-pulse"></div>
+                                <div className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-green-500 rounded-br-2xl animate-pulse"></div>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="text-white text-xs bg-black/70 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                                        Posisikan QR code di dalam kotak
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-2 text-green-500">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span className="text-sm font-medium">Memindai kode QR...</span>
+                    </div>
+
+                    <div className="text-center text-xs text-muted-foreground">
+                        💡 Tip: Pastikan QR code terlihat jelas dan pencahayaan cukup
+                    </div>
+                </div>
+            </Card>
+        </div>
+    );
+};
 
 interface ValidateBookingProps {
     onValidationSuccess?: (result: ValidationResponse) => void;
@@ -17,124 +195,40 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showScanner, setShowScanner] = useState(false);
-    const [scanning, setScanning] = useState(false);
     const [scanError, setScanError] = useState<string | null>(null);
 
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const streamRef = useRef<MediaStream | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const scanTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const startCamera = async () => {
-        try {
-            setShowScanner(true);
-            setScanning(true);
-            setScanError(null);
-            setError(null);
-
-            const constraints = {
-                video: {
-                    facingMode: { ideal: 'environment' },
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            };
-
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            streamRef.current = stream;
-
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-                await videoRef.current.play();
-
-               
-                scanTimeoutRef.current = setTimeout(() => {
-                    if (scanning) {
-                        stopCamera();
-                        setScanError('Pemindaian timeout. Pastikan QR code terlihat jelas dan pencahayaan cukup.');
-                    }
-                }, 30000); 
-
-                
-                requestAnimationFrame(scan);
-            }
-        } catch (err) {
-            console.error('Camera error:', err);
-            setScanError('Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.');
-            setShowScanner(false);
-            setScanning(false);
-        }
-    };
-
-    const stopCamera = () => {
-        if (scanTimeoutRef.current) {
-            clearTimeout(scanTimeoutRef.current);
-            scanTimeoutRef.current = null;
-        }
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(track => track.stop());
-            streamRef.current = null;
-        }
-        if (videoRef.current) {
-            videoRef.current.srcObject = null;
-        }
+    const handleQRScan = (data: string) => {
+        console.log('QR Scanned:', data);
         setShowScanner(false);
-        setScanning(false);
-        setScanError(null);
+
+        try {
+            // Try to parse as JSON
+            const parsed = JSON.parse(data);
+            const code = parsed.bookingCode || parsed.booking_code || parsed.code || parsed.id;
+
+            if (code) {
+                console.log('Extracted booking code:', code);
+                setBookingCode(code);
+                handleValidate(code);
+            } else {
+                console.log('No booking code found, using raw data');
+                setBookingCode(data.trim());
+                handleValidate(data.trim());
+            }
+        } catch {
+            // Not JSON, use raw data
+            console.log('Not JSON, using raw data');
+            setBookingCode(data.trim());
+            handleValidate(data.trim());
+        }
     };
 
-    const scan = () => {
-        if (!scanning || !videoRef.current || !canvasRef.current) return;
-
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d', { willReadFrequently: true });
-
-        if (!context) return;
-
- 
-        if (video.readyState !== video.HAVE_ENOUGH_DATA || video.videoWidth === 0) {
-            if (scanning) {
-                requestAnimationFrame(scan);
-            }
-            return;
-        }
-
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-
-        
-        const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: 'attemptBoth',
-        });
-
-        if (code && code.data) {
-            console.log('QR Code detected:', code.data);
-            stopCamera();
-
-            try {
-                const parsedData = JSON.parse(code.data);
-                const extractedBookingCode = parsedData.bookingCode;
-                if (!extractedBookingCode) {
-                    setScanError('QR code tidak valid: tidak ada bookingCode.');
-                    return;
-                }
-                setBookingCode(extractedBookingCode);
-                handleValidate(extractedBookingCode); 
-            } catch (parseErr) {
-                console.error('JSON parse error:', parseErr);
-                setScanError('QR code tidak valid: format JSON salah.');
-            }
-            return;
-        }
-
-        if (scanning) {
-            requestAnimationFrame(scan);
-        }
+    const handleScanError = (errorMsg: string) => {
+        setScanError(errorMsg);
+        setShowScanner(false);
     };
 
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,10 +249,16 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
 
             image.onload = () => {
                 const canvas = canvasRef.current;
-                if (!canvas) return;
+                if (!canvas) {
+                    setLoading(false);
+                    return;
+                }
 
                 const context = canvas.getContext('2d', { willReadFrequently: true });
-                if (!context) return;
+                if (!context) {
+                    setLoading(false);
+                    return;
+                }
 
                 canvas.width = image.width;
                 canvas.height = image.height;
@@ -166,32 +266,38 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
 
                 const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-              
-                const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: 'attemptBoth',
-                });
+                // Load jsQR if not already loaded
+                const scanImage = () => {
+                    if (typeof (window as any).jsQR !== 'undefined') {
+                        const code = (window as any).jsQR(imageData.data, imageData.width, imageData.height, {
+                            inversionAttempts: 'attemptBoth',
+                        });
 
-                if (code && code.data) {
-                  
-                    try {
-                        const parsedData = JSON.parse(code.data);
-                        const extractedBookingCode = parsedData.bookingCode;
-                        if (!extractedBookingCode) {
-                            setScanError('QR code tidak valid: tidak ada bookingCode.');
+                        if (code && code.data) {
+                            handleQRScan(code.data);
+                        } else {
+                            setScanError('Tidak dapat membaca QR code dari gambar. Pastikan gambar jelas dan QR code terlihat.');
                             setLoading(false);
-                            return;
                         }
-                        setBookingCode(extractedBookingCode);
-                        handleValidate(extractedBookingCode); 
-                    } catch (parseErr) {
-                        console.error('JSON parse error:', parseErr);
-                        setScanError('QR code tidak valid: format JSON salah.');
-                        setLoading(false);
+                    } else {
+                        // Load jsQR library
+                        const script = document.createElement('script');
+                        script.src = 'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js';
+                        script.onload = () => scanImage();
+                        script.onerror = () => {
+                            setScanError('Gagal memuat library scanner');
+                            setLoading(false);
+                        };
+                        document.head.appendChild(script);
                     }
-                } else {
-                    setScanError('Tidak dapat membaca QR code dari gambar. Pastikan gambar jelas dan QR code terlihat.');
-                    setLoading(false);
-                }
+                };
+
+                scanImage();
+            };
+
+            image.onerror = () => {
+                setScanError('Gagal memuat gambar');
+                setLoading(false);
             };
 
             reader.readAsDataURL(file);
@@ -218,9 +324,9 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
         setValidationResult(null);
 
         try {
-            console.log('Sending validation request for code:', codeToValidate); 
+            console.log('Validating code:', codeToValidate);
             const result = await apiClient.validateBooking(codeToValidate.trim());
-            console.log('Validation result:', result); 
+            console.log('Validation result:', result);
             setValidationResult(result);
             onValidationSuccess?.(result);
         } catch (err) {
@@ -246,7 +352,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
 
     return (
         <div className="w-full max-w-md mx-auto space-y-6">
-        
+         
             <div className="text-center space-y-4">
                 <div className="relative">
                     <div className="absolute inset-0 gradient-mesh opacity-20 blur-3xl rounded-full"></div>
@@ -260,7 +366,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                 </p>
             </div>
 
-           
+            
             <Card className="border-2 glass-card">
                 <CardContent className="p-6 space-y-4">
                     <div className="space-y-2">
@@ -274,7 +380,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                             onChange={(e) => setBookingCode(e.target.value)}
                             onKeyPress={handleKeyPress}
                             className="text-center font-mono text-sm"
-                            disabled={loading || scanning}
+                            disabled={loading}
                         />
                     </div>
 
@@ -300,20 +406,24 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                         </div>
                     )}
 
-                    <div className="grid grid-cols-1 gap-2">
-                        {/* <Button
-                            onClick={startCamera}
-                            disabled={loading || scanning}
+                    <div className="grid grid-cols-2 gap-2">
+                        <Button
+                            onClick={() => {
+                                setScanError(null);
+                                setError(null);
+                                setShowScanner(true);
+                            }}
+                            disabled={loading}
                             variant="outline"
                             size="lg"
                             className="w-full"
                         >
                             <Camera className="w-5 h-5 mr-2" />
                             Pindai
-                        </Button> */}
+                        </Button>
                         <Button
                             onClick={() => fileInputRef.current?.click()}
-                            disabled={loading || scanning}
+                            disabled={loading}
                             variant="outline"
                             size="lg"
                             className="w-full"
@@ -334,7 +444,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                     <div className="flex gap-2">
                         <Button
                             onClick={() => handleValidate()}
-                            disabled={loading || !bookingCode.trim() || scanning}
+                            disabled={loading || !bookingCode.trim()}
                             className="flex-1"
                             size="lg"
                         >
@@ -363,56 +473,19 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                 </CardContent>
             </Card>
 
-       
+           
             {showScanner && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-fade-in">
-                    <Card className="w-full max-w-lg border-2 shadow-2xl relative">
-                        <button
-                            onClick={stopCamera}
-                            className="absolute top-4 right-4 p-2 rounded-full bg-red-500 hover:bg-red-600 transition-colors z-10"
-                        >
-                            <X className="w-5 h-5 text-white" />
-                        </button>
-
-                        <div className="p-6 space-y-4">
-                            <div className="text-center">
-                                <h3 className="text-2xl font-bold mb-2">Pindai Kode QR</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Arahkan kamera ke kode QR booking
-                                </p>
-                            </div>
-
-                            <div className="relative bg-black rounded-xl overflow-hidden aspect-video">
-                                <video
-                                    ref={videoRef}
-                                    className="w-full h-full object-cover"
-                                    playsInline
-                                    muted
-                                    autoPlay
-                                />
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <div className="relative w-64 h-64">
-                                        <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-primary"></div>
-                                        <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-primary"></div>
-                                        <div className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-primary"></div>
-                                        <div className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-primary"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-center gap-2 text-primary">
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                                <span className="text-sm font-medium">Memindai...</span>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
+                <QRScanner
+                    onScan={handleQRScan}
+                    onError={handleScanError}
+                    onClose={() => setShowScanner(false)}
+                />
             )}
 
           
             <canvas ref={canvasRef} className="hidden" />
 
-      
+        
             {validationResult && (
                 <Card className={`border-2 animate-scale-in backdrop-blur-xl ${validationResult.valid
                     ? 'border-green-500/50 bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-950/30 dark:to-emerald-950/30'
