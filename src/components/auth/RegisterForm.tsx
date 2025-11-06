@@ -105,7 +105,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onToggleF
                                     <Input
                                         type="text"
                                         name="name"
-                                        placeholder="John Doe"
+                                        placeholder="Nama Lengkap"
                                         value={formData.name}
                                         onChange={handleChange}
                                         onFocus={() => setFocusedField('name')}
