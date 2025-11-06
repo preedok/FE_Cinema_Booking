@@ -1,13 +1,13 @@
-
 export interface User {
     id: number | string;
     email: string;
     name: string;
     role: 'customer' | 'cashier' | 'admin';
+    google_id?: string; 
+    avatar?: string;
     created_at: string;
     updated_at: string;
 }
-
 
 export interface AuthResponse {
     user: User;
@@ -85,6 +85,10 @@ export interface OfflineBookingForm {
     seatIds: number[];
     customerName: string;
     customerEmail: string;
+}
+
+export interface GoogleAuthRequest {
+    code: string;
 }
 
 export interface AuthStore {

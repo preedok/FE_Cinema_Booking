@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { apiClient } from '../../lib/api';
 import { useBookingStore } from '../../lib/stores/booking';
 import { useAuthStore } from '../../lib/stores/auth';
+import { getSupabaseToken } from '../../lib/supabase';
 import type { BookingResponse } from '../../types';
 
 interface BookingSummaryProps {
@@ -28,14 +29,27 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({ onSuccess }) => 
         setError(null);
 
         try {
+          
+            const supabaseToken = await getSupabaseToken();
+            const localToken = localStorage.getItem('token');
+
+            // console.log('=== Booking Debug ===');
+            // console.log('User:', user);
+            // console.log('Supabase token:', supabaseToken ? supabaseToken.substring(0, 20) + '...' : 'null');
+            // console.log('Local token:', localToken ? localToken.substring(0, 20) + '...' : 'null');
+            // console.log('Selected studio:', selectedStudio);
+            // console.log('Selected seats:', selectedSeats);
+
             const booking = await apiClient.createOnlineBooking({
                 studioId: selectedStudio,
                 seatIds: selectedSeats,
             });
 
+            console.log('Booking success:', booking);
             onSuccess?.(booking);
             clearSelection();
         } catch (err) {
+            console.error('Booking error:', err);
             setError(err instanceof Error ? err.message : 'Booking failed');
         } finally {
             setLoading(false);
