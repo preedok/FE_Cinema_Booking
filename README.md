@@ -31,13 +31,13 @@ cinema-booking/
 │   │   ├── auth/
 │   │   │   ├── LoginForm.tsx
 │   │   │   └── RegisterForm.tsx
-|   |   |   └── OfflineBookingSummary.tsx
 │   │   ├── booking/
 │   │   │   ├── StudioSelector.tsx
 │   │   │   ├── SeatSelector.tsx
 │   │   │   ├── BookingSummary.tsx
 │   │   │   ├── QRCodeModal.tsx
 │   │   │   └── BookingCard.tsx
+|   |   |   └── OfflineBookingSummary.tsx
 │   │   ├── ui/
 │   │   │   ├── Button.tsx
 │   │   │   ├── Input.tsx
@@ -109,7 +109,7 @@ cinema-booking/
    Navigate to `http://localhost:4321`
 
 ## 🔌 API Integration
-
+`https://github.com/preedok/FE_Cinema_Booking`
 The application integrates with the following API endpoints:
 
 ### Authentication
@@ -271,4 +271,4 @@ Built with ❤️ using modern by Muhamad Iqbal Aprido
 
 ---
 
-**Note**: Make sure your backend API is running before starting the application. The default API URL is `http://localhost:3000/api`.
+**Note**: Make sure your backend API is running before starting the application. The default API URL is `http://localhost:3000/api`. 
