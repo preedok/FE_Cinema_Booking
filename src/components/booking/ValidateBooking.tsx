@@ -5,7 +5,7 @@ import { Input } from '../ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { apiClient } from '../../lib/api';
 import type { ValidationResponse } from '../../types';
-import jsQR from 'jsqr'; // Import jsQR dari npm package
+import jsQR from 'jsqr'; 
 
 interface ValidateBookingProps {
     onValidationSuccess?: (result: ValidationResponse) => void;
@@ -24,7 +24,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const scanTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Tambahkan ref untuk timeout
+    const scanTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
 
     const startCamera = async () => {
         try {
@@ -48,15 +48,15 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                 videoRef.current.srcObject = stream;
                 await videoRef.current.play();
 
-                // Set timeout untuk stop scanning jika tidak ada deteksi dalam 30 detik
+               
                 scanTimeoutRef.current = setTimeout(() => {
                     if (scanning) {
                         stopCamera();
                         setScanError('Pemindaian timeout. Pastikan QR code terlihat jelas dan pencahayaan cukup.');
                     }
-                }, 30000); // 30 detik
+                }, 30000); 
 
-                // Start scanning after video is ready
+                
                 requestAnimationFrame(scan);
             }
         } catch (err) {
@@ -93,7 +93,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
 
         if (!context) return;
 
-        // Pastikan video sudah siap
+ 
         if (video.readyState !== video.HAVE_ENOUGH_DATA || video.videoWidth === 0) {
             if (scanning) {
                 requestAnimationFrame(scan);
@@ -107,16 +107,15 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-        // Tingkatkan opsi deteksi jsQR untuk lebih baik
+        
         const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: 'attemptBoth', // Coba dengan dan tanpa inversi
+            inversionAttempts: 'attemptBoth',
         });
 
         if (code && code.data) {
             console.log('QR Code detected:', code.data);
             stopCamera();
 
-            // Parse JSON dan ambil bookingCode
             try {
                 const parsedData = JSON.parse(code.data);
                 const extractedBookingCode = parsedData.bookingCode;
@@ -125,7 +124,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                     return;
                 }
                 setBookingCode(extractedBookingCode);
-                handleValidate(extractedBookingCode); // Langsung validasi setelah deteksi
+                handleValidate(extractedBookingCode); 
             } catch (parseErr) {
                 console.error('JSON parse error:', parseErr);
                 setScanError('QR code tidak valid: format JSON salah.');
@@ -167,13 +166,13 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
 
                 const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-                // Tingkatkan opsi deteksi jsQR untuk lebih baik
+              
                 const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: 'attemptBoth', // Coba dengan dan tanpa inversi
+                    inversionAttempts: 'attemptBoth',
                 });
 
                 if (code && code.data) {
-                    // Parse JSON dan ambil bookingCode
+                  
                     try {
                         const parsedData = JSON.parse(code.data);
                         const extractedBookingCode = parsedData.bookingCode;
@@ -183,7 +182,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                             return;
                         }
                         setBookingCode(extractedBookingCode);
-                        handleValidate(extractedBookingCode); // Langsung validasi setelah deteksi
+                        handleValidate(extractedBookingCode); 
                     } catch (parseErr) {
                         console.error('JSON parse error:', parseErr);
                         setScanError('QR code tidak valid: format JSON salah.');
@@ -202,7 +201,6 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
             setLoading(false);
         }
 
-        // Reset input
         event.target.value = '';
     };
 
@@ -220,13 +218,13 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
         setValidationResult(null);
 
         try {
-            console.log('Sending validation request for code:', codeToValidate); // Tambahkan logging
+            console.log('Sending validation request for code:', codeToValidate); 
             const result = await apiClient.validateBooking(codeToValidate.trim());
-            console.log('Validation result:', result); // Tambahkan logging
+            console.log('Validation result:', result); 
             setValidationResult(result);
             onValidationSuccess?.(result);
         } catch (err) {
-            console.error('Validation error:', err); // Tambahkan logging
+            console.error('Validation error:', err);
             setError(err instanceof Error ? err.message : 'Validasi gagal');
         } finally {
             setLoading(false);
