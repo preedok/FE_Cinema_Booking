@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { apiClient } from '../../lib/api';
 import type { ValidationResponse } from '../../types';
 
-// Simple QR Scanner Component using HTML5
 const QRScanner = ({ onScan, onError, onClose }: {
     onScan: (data: string) => void;
     onError: (error: string) => void;
@@ -41,7 +40,6 @@ const QRScanner = ({ onScan, onError, onClose }: {
                     videoRef.current.srcObject = stream;
                     videoRef.current.play();
 
-                    // Wait for video to be ready
                     videoRef.current.onloadedmetadata = () => {
                         if (mounted) {
                             setTimeout(() => {
@@ -77,7 +75,6 @@ const QRScanner = ({ onScan, onError, onClose }: {
 
                     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-                    // Use jsQR if available
                     if (typeof (window as any).jsQR !== 'undefined') {
                         const code = (window as any).jsQR(imageData.data, imageData.width, imageData.height, {
                             inversionAttempts: 'attemptBoth',
@@ -86,7 +83,7 @@ const QRScanner = ({ onScan, onError, onClose }: {
                         if (code && code.data && mounted) {
                             console.log('✅ QR Code detected:', code.data);
                             onScan(code.data);
-                            return; // Stop scanning after successful scan
+                            return; 
                         }
                     }
                 }
@@ -99,7 +96,6 @@ const QRScanner = ({ onScan, onError, onClose }: {
             scanFrame();
         };
 
-        // Load jsQR library
         const script = document.createElement('script');
         script.src = 'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js';
         script.async = true;
@@ -205,7 +201,6 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
         setShowScanner(false);
 
         try {
-            // Try to parse as JSON
             const parsed = JSON.parse(data);
             const code = parsed.bookingCode || parsed.booking_code || parsed.code || parsed.id;
 
@@ -219,7 +214,6 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                 handleValidate(data.trim());
             }
         } catch {
-            // Not JSON, use raw data
             console.log('Not JSON, using raw data');
             setBookingCode(data.trim());
             handleValidate(data.trim());
@@ -266,7 +260,6 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
 
                 const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-                // Load jsQR if not already loaded
                 const scanImage = () => {
                     if (typeof (window as any).jsQR !== 'undefined') {
                         const code = (window as any).jsQR(imageData.data, imageData.width, imageData.height, {
@@ -280,7 +273,6 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                             setLoading(false);
                         }
                     } else {
-                        // Load jsQR library
                         const script = document.createElement('script');
                         script.src = 'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js';
                         script.onload = () => scanImage();
