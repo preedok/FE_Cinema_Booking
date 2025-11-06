@@ -109,7 +109,8 @@ cinema-booking/
    Navigate to `http://localhost:4321`
 
 ## 🔌 API Integration
-`https://github.com/preedok/FE_Cinema_Booking`
+``
+https://github.com/gcode/cinema-booking
 The application integrates with the following API endpoints:
 
 ### Authentication
