@@ -38,7 +38,7 @@ export const SeatSelector: React.FC = () => {
                 <CardContent className="p-12 text-center">
                     <Armchair className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground text-lg">
-                        Please select a studio first
+                        Silakan pilih studio terlebih dahulu
                     </p>
                 </CardContent>
             </Card>
@@ -73,22 +73,22 @@ export const SeatSelector: React.FC = () => {
                     <Armchair className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-bold">Select Seats</h2>
+                    <h2 className="text-2xl font-bold">Pilih Kursi</h2>
                     <p className="text-sm text-muted-foreground">
-                        {selectedSeats.length} seat{selectedSeats.length !== 1 ? 's' : ''} selected
+                        {selectedSeats.length} kursi dipilih
                     </p>
                 </div>
             </div>
 
             <Card className="overflow-hidden">
                 <CardContent className="p-8">
-                    
+
                     <div className="mb-8">
                         <div className="h-2 gradient-primary rounded-full mx-auto max-w-3xl shadow-lg shadow-primary/50" />
-                        <p className="text-center text-sm text-muted-foreground mt-2">SCREEN</p>
+                        <p className="text-center text-sm text-muted-foreground mt-2">LAYAR</p>
                     </div>
 
-                    
+
                     <div className="space-y-3 max-w-fit mx-auto">
                         {rows.map((row) => (
                             <div key={row} className="flex items-center gap-2">
@@ -114,7 +114,7 @@ export const SeatSelector: React.FC = () => {
                                                             : 'bg-muted hover:bg-muted/80 hover:scale-105'
                                                         : 'bg-destructive/20 cursor-not-allowed opacity-50'
                                                 )}
-                                                title={`${seat.seat_number} - ${isAvailable ? 'Available' : 'Occupied'}`}
+                                                title={`${seat.seat_number} - ${isAvailable ? 'Tersedia' : 'Terisi'}`}
                                             >
                                                 {isSelected ? (
                                                     <CheckCircle2 className="w-5 h-5" />
@@ -124,7 +124,7 @@ export const SeatSelector: React.FC = () => {
                                                     <Armchair className="w-5 h-5" />
                                                 )}
 
-                                                
+
                                                 <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                                                     {seat.seat_number}
                                                 </span>
@@ -136,25 +136,25 @@ export const SeatSelector: React.FC = () => {
                         ))}
                     </div>
 
-                    
+
                     <div className="flex items-center justify-center gap-6 mt-8 pt-6 border-t">
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
                                 <Armchair className="w-4 h-4" />
                             </div>
-                            <span className="text-sm">Available</span>
+                            <span className="text-sm">Tersedia</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                                 <CheckCircle2 className="w-4 h-4 text-primary-foreground" />
                             </div>
-                            <span className="text-sm">Selected</span>
+                            <span className="text-sm">Dipilih</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-destructive/20 flex items-center justify-center opacity-50">
                                 <XCircle className="w-4 h-4 text-destructive" />
                             </div>
-                            <span className="text-sm">Occupied</span>
+                            <span className="text-sm">Terisi</span>
                         </div>
                     </div>
                 </CardContent>

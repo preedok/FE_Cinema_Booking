@@ -47,8 +47,8 @@ export const StudioSelector: React.FC = () => {
                     <Film className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-bold">Select Studio</h2>
-                    <p className="text-sm text-muted-foreground">Choose your preferred viewing room</p>
+                    <h2 className="text-2xl font-bold">Pilih Studio</h2>
+                    <p className="text-sm text-muted-foreground">Pilih ruang bioskop yang Anda inginkan</p>
                 </div>
             </div>
 
@@ -85,7 +85,7 @@ export const StudioSelector: React.FC = () => {
                                     <h3 className="font-semibold text-lg">{studio.name}</h3>
                                     <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground mt-1">
                                         <Users className="w-4 h-4" />
-                                        <span>{studio.total_seats} seats</span>
+                                        <span>{studio.total_seats} kursi</span>
                                     </div>
                                 </div>
                             </div>

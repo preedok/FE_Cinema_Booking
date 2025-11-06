@@ -21,7 +21,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({ onSuccess }) => 
 
     const handleBooking = async () => {
         if (!selectedStudio || selectedSeats.length === 0) {
-            setError('Please select studio and seats');
+            setError('Silakan pilih studio dan kursi');
             return;
         }
 
@@ -29,16 +29,9 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({ onSuccess }) => 
         setError(null);
 
         try {
-          
+
             const supabaseToken = await getSupabaseToken();
             const localToken = localStorage.getItem('token');
-
-            // console.log('=== Booking Debug ===');
-            // console.log('User:', user);
-            // console.log('Supabase token:', supabaseToken ? supabaseToken.substring(0, 20) + '...' : 'null');
-            // console.log('Local token:', localToken ? localToken.substring(0, 20) + '...' : 'null');
-            // console.log('Selected studio:', selectedStudio);
-            // console.log('Selected seats:', selectedSeats);
 
             const booking = await apiClient.createOnlineBooking({
                 studioId: selectedStudio,
@@ -50,7 +43,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({ onSuccess }) => 
             clearSelection();
         } catch (err) {
             console.error('Booking error:', err);
-            setError(err instanceof Error ? err.message : 'Booking failed');
+            setError(err instanceof Error ? err.message : 'Pemesanan gagal');
         } finally {
             setLoading(false);
         }
@@ -65,7 +58,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({ onSuccess }) => 
                     <div className="p-2 rounded-lg gradient-primary">
                         <Ticket className="w-5 h-5 text-white" />
                     </div>
-                    <CardTitle>Booking Summary</CardTitle>
+                    <CardTitle>Ringkasan Pemesanan</CardTitle>
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -79,26 +72,26 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({ onSuccess }) => 
                     <div className="flex justify-between items-center py-2 border-b">
                         <span className="text-sm text-muted-foreground">Studio</span>
                         <span className="font-medium">
-                            {selectedStudio ? `Studio ${selectedStudio}` : 'Not selected'}
+                            {selectedStudio ? `Studio ${selectedStudio}` : 'Belum dipilih'}
                         </span>
                     </div>
 
                     <div className="flex justify-between items-center py-2 border-b">
-                        <span className="text-sm text-muted-foreground">Seats</span>
+                        <span className="text-sm text-muted-foreground">Kursi</span>
                         <span className="font-medium">
-                            {selectedSeats.length || 0} seat{selectedSeats.length !== 1 ? 's' : ''}
+                            {selectedSeats.length || 0} kursi
                         </span>
                     </div>
 
                     <div className="flex justify-between items-center py-2">
-                        <span className="text-sm text-muted-foreground">Customer</span>
-                        <span className="font-medium">{user?.name || 'Guest'}</span>
+                        <span className="text-sm text-muted-foreground">Pelanggan</span>
+                        <span className="font-medium">{user?.name || 'Tamu'}</span>
                     </div>
                 </div>
 
                 {!user && (
                     <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/50 text-amber-600 dark:text-amber-400 text-sm">
-                        Please login to complete your booking
+                        Silakan masuk untuk menyelesaikan pemesanan Anda
                     </div>
                 )}
 
@@ -111,18 +104,18 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({ onSuccess }) => 
                     {loading ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processing...
+                            Memproses...
                         </>
                     ) : (
                         <>
                             <Ticket className="mr-2 h-4 w-4" />
-                            Confirm Booking
+                            Konfirmasi Pemesanan
                         </>
                     )}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
-                    You'll receive a QR code after booking
+                    Anda akan menerima kode QR setelah pemesanan
                 </p>
             </CardContent>
         </Card>

@@ -16,7 +16,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
     const handleDownload = () => {
         const link = document.createElement('a');
         link.href = booking.qr_code;
-        link.download = `ticket-${booking.booking_code}.png`;
+        link.download = `tiket-${booking.booking_code}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -26,6 +26,12 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
         active: 'bg-green-500/10 text-green-600 border-green-500/20',
         used: 'bg-gray-500/10 text-gray-600 border-gray-500/20',
         cancelled: 'bg-red-500/10 text-red-600 border-red-500/20',
+    };
+
+    const statusTranslation = {
+        active: 'Aktif',
+        used: 'Terpakai',
+        cancelled: 'Dibatalkan',
     };
 
     return (
@@ -40,7 +46,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
                             <div>
                                 <h3 className="font-semibold text-lg">Studio {booking.studio_id}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    {booking.booking_type === 'online' ? 'Online Booking' : 'Offline Booking'}
+                                    {booking.booking_type === 'online' ? 'Pemesanan Online' : 'Pemesanan Offline'}
                                 </p>
                             </div>
                         </div>
@@ -49,7 +55,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
                             'px-3 py-1 rounded-full text-xs font-medium border capitalize',
                             statusColors[booking.status]
                         )}>
-                            {booking.status}
+                            {statusTranslation[booking.status]}
                         </span>
                     </div>
                 </CardHeader>
@@ -67,22 +73,22 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
                         <div className="flex items-center gap-2">
                             <Users className="w-4 h-4 text-primary" />
                             <div>
-                                <p className="text-xs text-muted-foreground">Seats</p>
-                                <p className="text-sm font-medium">{booking.seat_ids.length} seat{booking.seat_ids.length !== 1 ? 's' : ''}</p>
+                                <p className="text-xs text-muted-foreground">Kursi</p>
+                                <p className="text-sm font-medium">{booking.seat_ids.length} kursi</p>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-2 col-span-2">
                             <Calendar className="w-4 h-4 text-primary" />
                             <div>
-                                <p className="text-xs text-muted-foreground">Booked on</p>
+                                <p className="text-xs text-muted-foreground">Dipesan pada</p>
                                 <p className="text-sm font-medium">{formatDate(booking.created_at)}</p>
                             </div>
                         </div>
                     </div>
 
                     <div className="p-3 rounded-lg bg-muted/50">
-                        <p className="text-xs text-muted-foreground mb-1">Booking Code</p>
+                        <p className="text-xs text-muted-foreground mb-1">Kode Booking</p>
                         <p className="font-mono text-xs break-all">{booking.booking_code}</p>
                     </div>
 
@@ -94,7 +100,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
                             size="sm"
                         >
                             <QrCode className="w-4 h-4 mr-2" />
-                            View QR
+                            Lihat QR
                         </Button>
                         <Button
                             onClick={handleDownload}
@@ -107,7 +113,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
                 </CardContent>
             </Card>
 
-            
+
             {showQR && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
                     <Card className="w-full max-w-md border-2 shadow-2xl relative">
@@ -120,20 +126,20 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
 
                         <div className="p-8 space-y-4">
                             <div className="text-center">
-                                <h3 className="text-2xl font-bold mb-2">Your Ticket</h3>
-                                <p className="text-sm text-muted-foreground">Show this QR code at the entrance</p>
+                                <h3 className="text-2xl font-bold mb-2">Tiket Anda</h3>
+                                <p className="text-sm text-muted-foreground">Tunjukkan kode QR ini di pintu masuk</p>
                             </div>
 
                             <div className="flex justify-center p-6 bg-white rounded-xl">
                                 <img
                                     src={booking.qr_code}
-                                    alt="QR Code"
+                                    alt="Kode QR"
                                     className="w-64 h-64"
                                 />
                             </div>
 
                             <div className="p-3 rounded-lg bg-muted/50">
-                                <p className="text-xs text-muted-foreground text-center mb-1">Booking Code</p>
+                                <p className="text-xs text-muted-foreground text-center mb-1">Kode Booking</p>
                                 <p className="font-mono text-sm text-center break-all">{booking.booking_code}</p>
                             </div>
 
@@ -142,7 +148,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
                                 className="w-full"
                             >
                                 <Download className="w-4 h-4 mr-2" />
-                                Download QR Code
+                                Unduh Kode QR
                             </Button>
                         </div>
                     </Card>

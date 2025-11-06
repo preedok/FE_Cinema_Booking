@@ -20,12 +20,12 @@ export const OfflineBookingSummary: React.FC<OfflineBookingSummaryProps> = ({ on
 
     const handleOfflineBooking = async () => {
         if (!selectedStudio || selectedSeats.length === 0) {
-            setError('Please select studio and seats');
+            setError('Silakan pilih studio dan kursi');
             return;
         }
 
         if (!customerName.trim() || !customerEmail.trim()) {
-            setError('Please fill in customer information');
+            setError('Silakan lengkapi informasi pelanggan');
             return;
         }
 
@@ -45,7 +45,7 @@ export const OfflineBookingSummary: React.FC<OfflineBookingSummaryProps> = ({ on
             setCustomerName('');
             setCustomerEmail('');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Booking failed');
+            setError(err instanceof Error ? err.message : 'Pemesanan gagal');
         } finally {
             setLoading(false);
         }
@@ -60,7 +60,7 @@ export const OfflineBookingSummary: React.FC<OfflineBookingSummaryProps> = ({ on
                     <div className="p-2 rounded-lg gradient-primary">
                         <Ticket className="w-5 h-5 text-white" />
                     </div>
-                    <CardTitle>Offline Booking</CardTitle>
+                    <CardTitle>Pemesanan Offline</CardTitle>
                 </div>
             </CardHeader>
 
@@ -75,30 +75,30 @@ export const OfflineBookingSummary: React.FC<OfflineBookingSummaryProps> = ({ on
                     <div className="flex justify-between items-center py-2 border-b">
                         <span className="text-sm text-muted-foreground">Studio</span>
                         <span className="font-medium">
-                            {selectedStudio ? `Studio ${selectedStudio}` : 'Not selected'}
+                            {selectedStudio ? `Studio ${selectedStudio}` : 'Belum dipilih'}
                         </span>
                     </div>
 
                     <div className="flex justify-between items-center py-2 border-b">
-                        <span className="text-sm text-muted-foreground">Seats</span>
+                        <span className="text-sm text-muted-foreground">Kursi</span>
                         <span className="font-medium">
-                            {selectedSeats.length || 0} seat{selectedSeats.length !== 1 ? 's' : ''}
+                            {selectedSeats.length || 0} kursi
                         </span>
                     </div>
                 </div>
 
                 <div className="space-y-4 pt-4 border-t">
-                    <h4 className="font-semibold text-sm">Customer Information</h4>
+                    <h4 className="font-semibold text-sm">Informasi Pelanggan</h4>
 
                     <div className="space-y-2">
                         <label className="block text-sm font-medium">
                             <div className="flex items-center gap-2 mb-1">
                                 <User className="w-4 h-4" />
-                                <span>Customer Name</span>
+                                <span>Nama Pelanggan</span>
                             </div>
                             <input
                                 type="text"
-                                placeholder="Enter customer name"
+                                placeholder="Masukkan nama pelanggan"
                                 value={customerName}
                                 onChange={(e) => setCustomerName(e.target.value)}
                                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -110,11 +110,11 @@ export const OfflineBookingSummary: React.FC<OfflineBookingSummaryProps> = ({ on
                         <label className="block text-sm font-medium">
                             <div className="flex items-center gap-2 mb-1">
                                 <Mail className="w-4 h-4" />
-                                <span>Customer Email</span>
+                                <span>Email Pelanggan</span>
                             </div>
                             <input
                                 type="email"
-                                placeholder="Enter customer email"
+                                placeholder="Masukkan email pelanggan"
                                 value={customerEmail}
                                 onChange={(e) => setCustomerEmail(e.target.value)}
                                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -124,8 +124,8 @@ export const OfflineBookingSummary: React.FC<OfflineBookingSummaryProps> = ({ on
                 </div>
 
                 <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/50 text-blue-600 dark:text-blue-400 text-sm">
-                    <p className="font-medium mb-1">Offline Booking</p>
-                    <p className="text-xs">This booking will be processed as walk-in purchase</p>
+                    <p className="font-medium mb-1">Pemesanan Offline</p>
+                    <p className="text-xs">Pemesanan ini akan diproses sebagai pembelian langsung</p>
                 </div>
 
                 <Button
@@ -137,18 +137,18 @@ export const OfflineBookingSummary: React.FC<OfflineBookingSummaryProps> = ({ on
                     {loading ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processing...
+                            Memproses...
                         </>
                     ) : (
                         <>
                             <Ticket className="mr-2 h-4 w-4" />
-                            Confirm Offline Booking
+                            Konfirmasi Pemesanan Offline
                         </>
                     )}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
-                    Customer will receive booking confirmation via email
+                    Pelanggan akan menerima konfirmasi pemesanan melalui email
                 </p>
             </CardContent>
         </Card>

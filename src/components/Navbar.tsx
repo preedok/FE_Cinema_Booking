@@ -67,14 +67,14 @@ export const Navbar: React.FC = () => {
 
 
                     <div className="hidden md:flex items-center gap-2">
-                      
+
                         <div className="relative">
                             <button
                                 onClick={() => setBookingDropdownOpen(!bookingDropdownOpen)}
                                 className="px-5 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium flex items-center gap-2 hover-lift"
                             >
                                 <Ticket className="w-4 h-4" />
-                                Book Tickets
+                                Pesan Tiket
                                 <ChevronDown className={`w-4 h-4 transition-transform ${bookingDropdownOpen ? 'rotate-180' : ''}`} />
                             </button>
 
@@ -87,8 +87,8 @@ export const Navbar: React.FC = () => {
                                     >
                                         <Smartphone className="w-4 h-4 text-primary" />
                                         <div>
-                                            <div className="font-medium">Online Booking</div>
-                                            <div className="text-xs text-muted-foreground">Book tickets online</div>
+                                            <div className="font-medium">Pemesanan Online</div>
+                                            <div className="text-xs text-muted-foreground">Pesan tiket secara online</div>
                                         </div>
                                     </a>
                                     <a
@@ -98,8 +98,8 @@ export const Navbar: React.FC = () => {
                                     >
                                         <CreditCard className="w-4 h-4 text-primary" />
                                         <div>
-                                            <div className="font-medium">Offline Booking</div>
-                                            <div className="text-xs text-muted-foreground">Walk-in purchase</div>
+                                            <div className="font-medium">Pemesanan Offline</div>
+                                            <div className="text-xs text-muted-foreground">Pembelian langsung</div>
                                         </div>
                                     </a>
                                 </div>
@@ -111,7 +111,7 @@ export const Navbar: React.FC = () => {
                             className="px-5 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium flex items-center gap-2 hover-lift"
                         >
                             <QrCode className="w-4 h-4" />
-                            Validate
+                            Validasi
                         </a>
                         {isAuthenticated ? (
                             <>
@@ -120,7 +120,7 @@ export const Navbar: React.FC = () => {
                                     className="px-5 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium flex items-center gap-2 hover-lift"
                                 >
                                     <Ticket className="w-4 h-4" />
-                                    My Tickets
+                                    Tiket Saya
                                 </a>
 
                                 <div className="flex items-center gap-3 pl-4 ml-2 border-l-2 border-slate-200 dark:border-slate-700">
@@ -140,7 +140,7 @@ export const Navbar: React.FC = () => {
                                         size="sm"
                                     >
                                         <LogOut className="w-4 h-4" />
-                                        Logout
+                                        Keluar
                                     </Button>
                                 </div>
                             </>
@@ -151,14 +151,14 @@ export const Navbar: React.FC = () => {
                                     variant="ghost"
                                     size="sm"
                                 >
-                                    Sign In
+                                    Masuk
                                 </Button>
                                 <Button
                                     onClick={() => window.location.href = '/auth?register=true'}
                                     size="sm"
                                 >
                                     <Sparkles className="w-4 h-4" />
-                                    Get Started
+                                    Daftar Sekarang
                                 </Button>
                             </div>
                         )}
@@ -180,22 +180,22 @@ export const Navbar: React.FC = () => {
 
                 {mobileMenuOpen && (
                     <div className="md:hidden py-6 space-y-3 border-t border-slate-200 dark:border-slate-700 animate-fade-in">
-                     
+
                         <div className="px-5 space-y-2">
-                            <div className="text-sm font-semibold text-muted-foreground mb-2">Book Tickets</div>
+                            <div className="text-sm font-semibold text-muted-foreground mb-2">Pesan Tiket</div>
                             <a
                                 href="/booking"
                                 className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium"
                             >
                                 <Smartphone className="w-4 h-4" />
-                                Online Booking
+                                Pemesanan Online
                             </a>
                             <a
                                 href="/booking-offline"
                                 className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium"
                             >
                                 <CreditCard className="w-4 h-4" />
-                                Offline Booking
+                                Pemesanan Offline
                             </a>
                         </div>
 
@@ -204,7 +204,7 @@ export const Navbar: React.FC = () => {
                             className=" px-5 py-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium flex items-center gap-2"
                         >
                             <QrCode className="w-4 h-4" />
-                            Validate
+                            Validasi
                         </a>
 
                         {isAuthenticated ? (
@@ -214,7 +214,7 @@ export const Navbar: React.FC = () => {
                                     className=" px-5 py-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium flex items-center gap-2"
                                 >
                                     <Ticket className="w-4 h-4" />
-                                    My Tickets
+                                    Tiket Saya
                                 </a>
 
                                 <div className="px-5 py-4 space-y-4 border-t border-slate-200 dark:border-slate-700 mt-4 pt-6">
@@ -237,7 +237,7 @@ export const Navbar: React.FC = () => {
                                         className="w-full"
                                     >
                                         <LogOut className="w-4 h-4" />
-                                        Logout
+                                        Keluar
                                     </Button>
                                 </div>
                             </>
@@ -248,14 +248,14 @@ export const Navbar: React.FC = () => {
                                     variant="outline"
                                     className="w-full"
                                 >
-                                    Sign In
+                                    Masuk
                                 </Button>
                                 <Button
                                     onClick={() => window.location.href = '/auth?register=true'}
                                     className="w-full"
                                 >
                                     <Sparkles className="w-4 h-4" />
-                                    Get Started
+                                    Daftar Sekarang
                                 </Button>
                             </div>
                         )}
