@@ -67,7 +67,7 @@ export const Navbar: React.FC = () => {
 
 
                     <div className="hidden md:flex items-center gap-2">
-                        {/* Booking Dropdown */}
+                      
                         <div className="relative">
                             <button
                                 onClick={() => setBookingDropdownOpen(!bookingDropdownOpen)}
@@ -180,7 +180,7 @@ export const Navbar: React.FC = () => {
 
                 {mobileMenuOpen && (
                     <div className="md:hidden py-6 space-y-3 border-t border-slate-200 dark:border-slate-700 animate-fade-in">
-                        {/* Mobile Booking Section */}
+                     
                         <div className="px-5 space-y-2">
                             <div className="text-sm font-semibold text-muted-foreground mb-2">Book Tickets</div>
                             <a

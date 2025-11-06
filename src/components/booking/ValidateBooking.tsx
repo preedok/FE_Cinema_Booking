@@ -51,7 +51,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
 
     return (
         <div className="w-full max-w-md mx-auto space-y-6">
-            {/* Header */}
+         
             <div className="text-center space-y-4">
                 <div className="relative">
                     <div className="absolute inset-0 gradient-mesh opacity-20 blur-3xl rounded-full"></div>
@@ -65,7 +65,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                 </p>
             </div>
 
-            {/* Input Card */}
+         
             <Card className="border-2 glass-card">
                 <CardContent className="p-6 space-y-4">
                     <div className="space-y-2">
@@ -126,7 +126,7 @@ export const ValidateBooking: React.FC<ValidateBookingProps> = ({ onValidationSu
                 </CardContent>
             </Card>
 
-            {/* Validation Result */}
+         
             {validationResult && (
                 <Card className={`border-2 animate-scale-in backdrop-blur-xl ${validationResult.valid
                         ? 'border-green-500/50 bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-950/30 dark:to-emerald-950/30'
